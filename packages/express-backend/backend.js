@@ -38,6 +38,12 @@ const findUserByName = (name) => {
   return users["users_list"].filter((user) => user["name"] === name);
 };
 
+const findUserByNameAndJob = (name, job) => {
+  return users["users_list"].filter(
+    (user) => user["name"] === name && user["job"] === job
+  );
+};
+
 const findUserById = (id) =>
   users["users_list"].find((user) => user["id"] === id);
 
@@ -54,7 +60,15 @@ app.get("/", (req, res) => {
 
 app.get("/users", (req, res) => {
   const name = req.query.name;
-  if (name != undefined) {
+  const job = req.query.job;
+
+  if (name !== undefined && job !== undefined) {
+    //for step 7, part 2
+    //url should be: http://localhost:8000/users?name=Charlie&job=Janitor
+    let result = findUserByNameAndJob(name, job);
+    result = { users_list: result };
+    res.send(result);
+  } else if (name !== undefined) {
     let result = findUserByName(name);
     result = { users_list: result };
     res.send(result);
@@ -77,6 +91,19 @@ app.post("/users", (req, res) => {
   const userToAdd = req.body;
   addUser(userToAdd);
   res.send();
+});
+
+app.delete("/users/:id", (req, res) => {
+  const id = req.params["id"]; //or req.params.id
+  const user_index = users["users_list"].findIndex((user) => user["id"] === id);
+  if (user_index === -1) {
+    res.status(404).send("Resource not found.");
+  } else {
+    //the user exists
+    //delete user info here
+    users["users_list"].splice(user_index, 1);
+    res.send("deletion was a success!");
+  }
 });
 
 app.listen(port, () => {
