@@ -53,6 +53,11 @@ const addUser = (user) => {
   return user;
 };
 
+function generateRandomId() {
+  const randomId = Math.random().toString(36).substring(5);
+  return randomId;
+}
+
 app.use(cors());
 app.use(express.json());
 
@@ -91,8 +96,10 @@ app.get("/users/:id", (req, res) => {
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
-  addUser(userToAdd);
-  res.send();
+  const randomId = generateRandomId() //function for random id generator
+  userToAdd.id = randomId;
+  const added_user = addUser(userToAdd);
+  res.status(201).send(added_user);
 });
 
 app.delete("/users/:id", (req, res) => {
@@ -104,7 +111,7 @@ app.delete("/users/:id", (req, res) => {
     //the user exists
     //delete user info here
     users["users_list"].splice(user_index, 1);
-    res.send("deletion was a success!");
+    res.status(204).send("deletion was a success!");
   }
 });
 
